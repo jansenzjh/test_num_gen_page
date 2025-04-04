@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>💡 Question Generator</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background: #fffafc;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      flex: 1;
+      min-width: 120px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffe6f0;
+      color: #333;
+      transition: background-color 0.2s ease;
+    }
+    button:hover {
+      background-color: #ffd3e6;
+    }
+    .table-wrapper {
+      margin-bottom: 40px;
+      border: 1px solid #ffccdd;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #fff0f5;
+    }
+    .timestamp {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #7a4e65;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      word-wrap: break-word;
+    }
+    th, td {
+      border: 1px solid #ffa3bf;
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #ffe0eb;
+    }
+    @media screen and (max-width: 600px) {
+      th, td {
+        font-size: 12px;
+        padding: 6px;
+      }
+      button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="button-group">
+    <button id="generateBtn">🎲 Generate Questions</button>
+    <button id="clearBtn">🧹 Clear All</button>
+  </div>
+
+  <div id="tablesContainer"></div>
+
+  <script>
+    const chapters = [
+      { chapter: 1, size: 5, total: 89 },
+      { chapter: 2, size: 5, total: 44 },
+      { chapter: 3, size: 5, total: 44 },
+      { chapter: 4, size: 5, total: 45 },
+      { chapter: 5, size: 5, total: 80 },
+      { chapter: 6, size: 5, total: 122 },
+      { chapter: 7, size: 3, total: 22 },
+      { chapter: 8, size: 2, total: 16 },
+      { chapter: 9, size: 5, total: 62 },
+      { chapter: 10, size: 7, total: 90 },
+      { chapter: 11, size: 5, total: 47 },
+      { chapter: 12, size: 2, total: 80 },
+      { chapter: 13, size: 2, total: 24 },
+      { chapter: 14, size: 2, total: 30 }
+    ];
+
+    function getRandomNumbers(count, max) {
+      const numbers = new Set();
+      while (numbers.size < count) {
+        numbers.add(Math.floor(Math.random() * max) + 1);
+      }
+      return Array.from(numbers).sort((a, b) => a - b);
+    }
+
+    function getCurrentTimeString() {
+      return new Date().toLocaleString();
+    }
+
+    function generateData() {
+      const timestamp = getCurrentTimeString();
+      const data = chapters.map(ch => ({
+        chapter: ch.chapter,
+        questions: getRandomNumbers(ch.size, ch.total)
+      }));
+      return { timestamp, data };
+    }
+
+    function renderTable(tableData) {
+      const $wrapper = $('<div class="table-wrapper"></div>');
+      const $timestamp = $('<div class="timestamp">🕒 Generated at: ' + tableData.timestamp + '</div>');
+      const $table = $('<table></table>');
+      $table.append('<tr><th>📘 Chapter</th><th>📝 Selected Questions</th></tr>');
+
+      tableData.data.forEach(row => {
+        $table.append(`<tr><td>Chapter ${row.chapter}</td><td>${row.questions.join(', ')}</td></tr>`);
+      });
+
+      $wrapper.append($timestamp).append($table);
+      $('#tablesContainer').prepend($wrapper);
+    }
+
+    function saveToLocalStorage(allTables) {
+      localStorage.setItem('generatedTables', JSON.stringify(allTables));
+    }
+
+    function loadFromLocalStorage() {
+      const data = localStorage.getItem('generatedTables');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function clearAllData() {
+      localStorage.removeItem('generatedTables');
+      $('#tablesContainer').empty();
+    }
+
+    $(document).ready(function () {
+      const storedTables = loadFromLocalStorage();
+      storedTables.reverse().forEach(renderTable);
+    });
+
+    $('#generateBtn').click(function () {
+      const newTable = generateData();
+      renderTable(newTable);
+
+      const storedTables = loadFromLocalStorage();
+      storedTables.push(newTable);
+      saveToLocalStorage(storedTables);
+    });
+
+    $('#clearBtn').click(function () {
+      if (confirm("💭 Are you sure you want to clear all the happy tables?")) {
+        clearAllData();
+      }
+    });
+  </script>
+
+</body>
+</html>
