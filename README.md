@@ -8,11 +8,16 @@ Hi there! 👋 This is a little web app I made with love 💖 for my wife. It’
 
 With just one click of the magical **🎲 Generate Questions** button, this page will:
 
-- Randomly pick questions from each chapter based on preset limits.
-- Show them nicely in a cute little table.
-- Display the time the questions were generated ⏰ (so we know when the magic happened).
-- Keep every set of questions forever (or until she hits the 🧹 "Clear All" button).
-- Work beautifully on mobile phones! 📱
+- 🔘 Create a new quiz table
+- 📚 Questions are selected randomly based on predefined chapter sizes
+- 📅 Each table shows the timestamp of when it was created
+- 📌 Each question appears as a clickable button
+- ❌ Tapping a question marks it as incorrect (red)
+- 🎯 Score is calculated and displayed as a percentage based on incorrect answers
+- 🧹 "Clear All" button to reset all data
+- 💾 All generated tables are saved using `localStorage`, so they won’t disappear on refresh
+- 📱 Fully responsive and mobile-friendly
+- 🥰 Includes fun emojis to make the experience delightful
 
 Each time she clicks the button, a new table appears at the top — so she can generate as many sets as she likes!
 
