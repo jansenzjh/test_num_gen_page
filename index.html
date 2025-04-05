@@ -34,6 +34,19 @@
     button:hover {
       background-color: #ffd3e6;
     }
+    .question-button {
+      margin: 2px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #ffaecb;
+      background-color: #fff0f5;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .question-button.red {
+      background-color: #ff6666;
+      color: white;
+    }
     .table-wrapper {
       margin-bottom: 40px;
       border: 1px solid #ffccdd;
@@ -52,6 +65,7 @@
       width: 100%;
       table-layout: fixed;
       word-wrap: break-word;
+      margin-bottom: 10px;
     }
     th, td {
       border: 1px solid #ffa3bf;
@@ -61,6 +75,11 @@
     }
     th {
       background-color: #ffe0eb;
+    }
+    .score {
+      font-weight: bold;
+      color: #444;
+      margin-top: 5px;
     }
     @media screen and (max-width: 600px) {
       th, td {
@@ -122,17 +141,38 @@
     }
 
     function renderTable(tableData) {
+      const tableId = `table-${Date.now()}`;
       const $wrapper = $('<div class="table-wrapper"></div>');
       const $timestamp = $('<div class="timestamp">🕒 Generated at: ' + tableData.timestamp + '</div>');
       const $table = $('<table></table>');
       $table.append('<tr><th>📘 Chapter</th><th>📝 Selected Questions</th></tr>');
 
+      let totalQuestions = 0;
+
       tableData.data.forEach(row => {
-        $table.append(`<tr><td>Chapter ${row.chapter}</td><td>${row.questions.join(', ')}</td></tr>`);
+        totalQuestions += row.questions.length;
+        const buttons = row.questions.map(q =>
+          `<button class="question-button" data-table="${tableId}">${q}</button>`
+        ).join('');
+        $table.append(`<tr><td>Chapter ${row.chapter}</td><td>${buttons}</td></tr>`);
       });
 
-      $wrapper.append($timestamp).append($table);
+      const $score = $(`<div class="score" id="score-${tableId}">🎯 Score: 1.00</div>`);
+
+      $wrapper.append($timestamp).append($table).append($score);
       $('#tablesContainer').prepend($wrapper);
+
+      // Add event listener to buttons
+      $wrapper.on('click', '.question-button', function () {
+        $(this).toggleClass('red');
+        updateScore(tableId, totalQuestions);
+      });
+    }
+
+    function updateScore(tableId, totalQuestions) {
+      const redCount = $(`[data-table="${tableId}"].red`).length;
+      const score = 100 - ((redCount / totalQuestions) * 100);
+      $(`#score-${tableId}`).text(`🎯 Score: ${Math.round(score)}%`);
     }
 
     function saveToLocalStorage(allTables) {
